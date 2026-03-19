@@ -5,7 +5,7 @@ class VentanaDatosReceta(ctk.CTkToplevel):
         super().__init__(parent)
         self.title("Datos para la Receta")
         self.geometry("400x500")
-        self.callback = callback  # Función que abrirá la receta final
+        self.callback = callback  
         
         # Centrar ventana y poner al frente
         self.attributes("-topmost", True)
@@ -13,7 +13,7 @@ class VentanaDatosReceta(ctk.CTkToplevel):
         ctk.CTkLabel(self, text="RELLENAR DATOS", 
                      font=("Roboto", 16, "bold")).pack(pady=20)
 
-        # Campos de entrada
+        
         self.entry_nombre = self.crear_input("Nombre Completo del Paciente:")
         self.entry_fecha = self.crear_input("Fecha (DD/MM/AAAA):", 
             datetime.date.today().strftime("%d/%m/%Y"))
@@ -32,12 +32,13 @@ class VentanaDatosReceta(ctk.CTkToplevel):
         return entry
 
     def enviar_datos(self):
-        # Recolectamos todo en un diccionario
+        # Recolección en diccionario
         datos = {
             "nombre": self.entry_nombre.get().upper(),
             "fecha": self.entry_fecha.get(),
             "edad": self.entry_edad.get(),
             "actividad": self.entry_actividad.get()
         }
-        self.destroy() # Cerramos esta ventana
-        self.callback(datos) # Enviamos los datos a la función principal
+        # Cerramos esta ventana
+        self.destroy() 
+        self.callback(datos) 
