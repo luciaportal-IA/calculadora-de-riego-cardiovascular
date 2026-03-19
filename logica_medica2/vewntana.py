@@ -16,21 +16,21 @@ class AppCardio(ctk.CTk):
         self.geometry("850x550")
         self.configure(fg_color="#1a1a1a") # Fondo muy oscuro
 
-        # --- COLUMNA IZQUIERDA (Entrada de datos) ---
+        # Entrada de datos
         self.sidebar = ctk.CTkFrame(self, width=300, corner_radius=15, fg_color="#252525")
         
         self.sidebar.pack(side="left", fill="y", padx=20, pady=20)
 
         ctk.CTkLabel(self.sidebar, text="DATOS MÉDICOS", font=("Roboto", 18, "bold"), text_color="#3b8ed0").pack(pady=15)
         
-        # Botón de ayuda con estilo de "enlace"
+        # Botón de ayuda 
         self.btn_ayuda = ctk.CTkButton(
         self.sidebar, 
         text="¿No conoces tus datos? Haz clic aquí", 
-        fg_color="transparent",      # Sin fondo para que parezca texto
-        text_color="#3b8ed0",         # Color azul de link
+        fg_color="transparent",      
+        text_color="#3b8ed0",         
         font=("Roboto", 11, "underline"),
-        hover_color="#252525",        # Color del fondo al pasar el mouse
+        hover_color="#252525",        
         command=self.abrir_guia
         )
         self.btn_ayuda.pack(pady=1)
@@ -55,13 +55,13 @@ class AppCardio(ctk.CTk):
                                           height=40, command=self.obtener_resultado)
         self.btn_calcular.pack(pady=2, padx=20, fill="x")
 
-        # --- COLUMNA DERECHA (Resultados) ---
+        # Resultados
         self.main_view = ctk.CTkFrame(self, fg_color="transparent")
         self.main_view.pack(side="right", fill="both", expand=True, padx=20, pady=20)
 
         ctk.CTkLabel(self.main_view, text="RESULTADO DEL ANÁLISIS", font=("Roboto", 22, "bold")).pack(pady=10)
 
-        # Círculo de porcentaje (Más grande y moderno)
+        # Círculo de porcentaje 
         self.circulo_riesgo = ctk.CTkFrame(self.main_view, width=220, height=220, corner_radius=110, fg_color="#333333", border_width=5, border_color="#444444")
         self.circulo_riesgo.pack(pady=30)
         self.circulo_riesgo.pack_propagate(False)
@@ -72,11 +72,10 @@ class AppCardio(ctk.CTk):
         self.label_status = ctk.CTkLabel(self.main_view, text="Esperando datos...", font=("Roboto", 16, "italic"), text_color="gray")
         self.label_status.pack(pady=10)
         
-        # Título de la simulación
         self.label_tiempo = ctk.CTkLabel(self.main_view, text="Proyección temporal: Año 10", font=("Roboto", 14))
         self.label_tiempo.pack(pady=(20, 0))
 
-# El Slider: va de 1 a 10
+# Va de 1 a 10
         self.label_status = ctk.CTkLabel(self.main_view, text="Esperando datos...", 
             font=("Roboto", 16, "bold"), wraplength=350)
         self.label_status.pack(pady=10)
@@ -89,7 +88,7 @@ class AppCardio(ctk.CTk):
              font=("Roboto", 12, "italic"), text_color="gray", wraplength=400)
         self.label_aviso_fijo.pack(side="bottom", pady=20)
         
-        # MOSTRAR BIENVENIDA AL FINAL
+    
         self.mostrar_bienvenida()
 
     def mostrar_bienvenida(self):
@@ -97,11 +96,9 @@ class AppCardio(ctk.CTk):
         self.frame_bienvenida = ctk.CTkFrame(self, fg_color="#1a1a1a")
         self.frame_bienvenida.place(relx=0, rely=0, relwidth=1, relheight=1)
 
-    # Este Frame invisible asegura que todo se mantenga en el centro
         self.contenedor_central = ctk.CTkFrame(self.frame_bienvenida, fg_color="transparent")
         self.contenedor_central.pack(expand=True)
 
-    # Texto de Bienvenida centrado
         ctk.CTkLabel(self.contenedor_central, text="BIENVENIDO", 
                  font=("Roboto", 90, "bold"), text_color="#3b8ed0").pack(pady=10)
     
@@ -132,7 +129,6 @@ class AppCardio(ctk.CTk):
         return entry
        
     def actualizar_proyeccion(self, valor):
-    # 'valor' es el año seleccionado en el slider (1 al 10)
         año_actual = int(valor)
         self.label_tiempo.configure(text=f"Proyección temporal: Año {año_actual}")
         try:
@@ -142,10 +138,10 @@ class AppCardio(ctk.CTk):
            f = "si" if self.check_fumar.get() else "no"
            l = "si" if self.check_antecedentesF.get() else "no"
 
-        # 2. Calculamos el riesgo base (a 10 años)
+        # 2. Calculamos el riesgo a 10 años
            _, riesgo_10_años = calcular_puntos_edad(g, e, d, f, p, c, h, l)
         
-        # 3. Lógica de simulación: Riesgo proporcional al año
+        # 3. Riesgo proporcional al año
         # Formula: (Riesgo total / 10) * año seleccionado
            riesgo_proyectado = round((riesgo_10_años / 10) * año_actual, 1)
         
@@ -173,16 +169,16 @@ class AppCardio(ctk.CTk):
             self.label_porcentaje.configure(text=f"{riesgo}%")
             
             if riesgo > 30:
-                color = "#8B0000" # Rojo oscuro
+                color = "#8B0000" 
                 status = "¡ALERTA!: Riesgo Crítico. Requiere atención inmediata."
             elif riesgo > 20:
-                color = "#e74c3c" # Rojo normal
+                color = "#e74c3c" 
                 status = "Riesgo Alto: Consulte a su cardiólogo"
             elif riesgo >= 10:
-                color = "#f1c40f" # Amarillo
+                color = "#f1c40f" 
                 status = "Riesgo Moderado: Se recomienda revisión médica"
             else:
-                color = "#2ecc71" # Verde
+                color = "#2ecc71" 
                 status = "Riesgo Bajo: Mantenga hábitos saludables"
                 
             self.label_porcentaje.configure(text=f"{riesgo}%", text_color="white" if riesgo > 20 else "black")
@@ -192,17 +188,14 @@ class AppCardio(ctk.CTk):
         except Exception as err:
             self.label_status.configure(text="Error: Ingrese valores válidos", text_color="red") 
             
-            # ESTO VA EN ventana.py
+           
     def solicitar_datos_informe(self):
-        # Aquí se crea la conexión con el archivo externo
         VentanaDatosReceta(self, self.abrir_receta_final)
         
     def abrir_receta_final(self, datos_formulario):
-        # Esta función recibe los datos y lanza la receta médica
         texto_riesgo = self.label_porcentaje.cget("text")
         riesgo_actual = texto_riesgo.replace("%", "")
         
-        # Usamos los datos recolectados en el formulario
         consejos_finales = self.preparar_texto_receta_v2(datos_formulario['actividad'])
         
         # Abrimos la receta médica final
@@ -222,6 +215,6 @@ class AppCardio(ctk.CTk):
 
         return "\n\n".join(c) if c else "Mantener hábitos saludables." 
 if __name__ == "__main__":
-    app = AppCardio()  # Crea la aplicación
-    app.mainloop()     # Mantiene la ventana abierta
+    app = AppCardio()  
+    app.mainloop()     
        
