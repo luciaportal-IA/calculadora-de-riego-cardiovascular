@@ -1,8 +1,9 @@
 import customtkinter as ctk
 from calcular_puntos_edad import calcular_puntos_edad
 import webbrowser
-from PIL import Image
-
+import datetime
+from receta_medica import VentanaReceta
+from VentanaDatosReceta import VentanaDatosReceta
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
@@ -17,6 +18,7 @@ class AppCardio(ctk.CTk):
 
         # --- COLUMNA IZQUIERDA (Entrada de datos) ---
         self.sidebar = ctk.CTkFrame(self, width=300, corner_radius=15, fg_color="#252525")
+        
         self.sidebar.pack(side="left", fill="y", padx=20, pady=20)
 
         ctk.CTkLabel(self.sidebar, text="DATOS MÉDICOS", font=("Roboto", 18, "bold"), text_color="#3b8ed0").pack(pady=15)
@@ -44,7 +46,8 @@ class AppCardio(ctk.CTk):
         self.check_fumar.pack(pady=10)
         self.check_antecedentesF = ctk.CTkCheckBox(self.sidebar, text="Antecedentes familiares?", text_color="white")
         self.check_antecedentesF.pack(pady=10)
-
+        self.check_Dieta = ctk.CTkCheckBox(self.sidebar, text="Dieta Saludable?", text_color="white")
+        self.check_Dieta.pack(pady=10)
         self.check_diabetico = ctk.CTkCheckBox(self.sidebar, text="Diabetico?", text_color="white")
         self.check_diabetico.pack(pady=10)
 
@@ -82,9 +85,10 @@ class AppCardio(ctk.CTk):
         self.slider_tiempo.set(10)
         self.slider_tiempo.pack(pady=10, padx=50, fill="x")
         self.label_aviso_fijo = ctk.CTkLabel(self.main_view, 
-             text="Recuerde que siempre es mejor consular a un porfesional", 
+             text="Recuerde que siempre es mejor consultar a un porfesional", 
              font=("Roboto", 12, "italic"), text_color="gray", wraplength=400)
         self.label_aviso_fijo.pack(side="bottom", pady=20)
+        
         # MOSTRAR BIENVENIDA AL FINAL
         self.mostrar_bienvenida()
 
@@ -97,30 +101,26 @@ class AppCardio(ctk.CTk):
         self.contenedor_central = ctk.CTkFrame(self.frame_bienvenida, fg_color="transparent")
         self.contenedor_central.pack(expand=True)
 
-    # --- AGREGAR IMAGEN (Logo) ---
-        try:
-        # Reemplaza "logo_medico.png" con el nombre de tu archivo de imagen
-            img = ctk.CTkImage(light_image=Image.open("logo_medico.png"),
-                           dark_image=Image.open("logo_medico.png"),
-                           size=(160, 160))
-            self.label_logo = ctk.CTkLabel(self.contenedor_central, image=img, text="")
-            self.label_logo.pack(pady=20)
-        except Exception as e:
-        
-
     # Texto de Bienvenida centrado
-            ctk.CTkLabel(self.contenedor_central, text="BIENVENIDO", 
+        ctk.CTkLabel(self.contenedor_central, text="BIENVENIDO", 
                  font=("Roboto", 90, "bold"), text_color="#3b8ed0").pack(pady=10)
     
-            ctk.CTkLabel(self.contenedor_central, 
+        ctk.CTkLabel(self.contenedor_central, 
                  text="Software de Evaluación Framingham\nPrecisión y Cuidado Cardiovascular", 
                  font=("Roboto", 25)).pack(pady=10)
 
     # Botón de entrada
-            self.btn_entrar = ctk.CTkButton(self.contenedor_central, text="INICIAR", 
+        self.btn_entrar = ctk.CTkButton(self.contenedor_central, text="INICIAR", 
                                     width=250, height=60, font=("Roboto", 16, "bold"),
                                     command=self.entrar_a_calculadora)
-            self.btn_entrar.pack(pady=40)
+        self.btn_entrar.pack(pady=40)
+        
+        self.btn_receta = ctk.CTkButton(self.main_view, text="GENERAR RECETA MÉDICA", 
+                                        font=("Roboto", 14, "bold"),
+                                        fg_color="#2ecc71", hover_color="#27ae60",
+                                        height=45,
+                                        command=self.solicitar_datos_informe)
+        self.btn_receta.place(relx=0.95, rely=0.95, anchor="se")
         
     def entrar_a_calculadora(self):
         self.frame_bienvenida.destroy()
@@ -138,13 +138,10 @@ class AppCardio(ctk.CTk):
         try:
         # 1. Obtenemos los datos actuales de los cuadros
            e, g, p, c, h = int(self.entry_edad.get()), self.entry_genero.get().lower(), int(self.entry_presion.get()), int(self.entry_colesterol.get()), int(self.entry_hdl.get())
-           f = "si" if self.check_fumar.get() else "no"
            d = "si" if self.check_diabetico.get() else "no"
            f = "si" if self.check_fumar.get() else "no"
            l = "si" if self.check_antecedentesF.get() else "no"
-           
-          
-        
+
         # 2. Calculamos el riesgo base (a 10 años)
            _, riesgo_10_años = calcular_puntos_edad(g, e, d, f, p, c, h, l)
         
@@ -170,7 +167,7 @@ class AppCardio(ctk.CTk):
             d = "si" if self.check_diabetico.get() else "no"
             l = "si" if self.check_antecedentesF.get() else "no"
             
-            
+        
             pts, riesgo = calcular_puntos_edad(g, e, d, f, p, c, h, l)
 
             self.label_porcentaje.configure(text=f"{riesgo}%")
@@ -193,8 +190,37 @@ class AppCardio(ctk.CTk):
             self.label_status.configure(text=status, text_color=color)
 
         except Exception as err:
-            self.label_status.configure(text="Error: Ingrese valores válidos", text_color="red")    
+            self.label_status.configure(text="Error: Ingrese valores válidos", text_color="red") 
             
+            # ESTO VA EN ventana.py
+    def solicitar_datos_informe(self):
+        # Aquí se crea la conexión con el archivo externo
+        VentanaDatosReceta(self, self.abrir_receta_final)
+        
+    def abrir_receta_final(self, datos_formulario):
+        # Esta función recibe los datos y lanza la receta médica
+        texto_riesgo = self.label_porcentaje.cget("text")
+        riesgo_actual = texto_riesgo.replace("%", "")
+        
+        # Usamos los datos recolectados en el formulario
+        consejos_finales = self.preparar_texto_receta_v2(datos_formulario['actividad'])
+        
+        # Abrimos la receta médica final
+        VentanaReceta(self, datos_formulario, riesgo_actual, consejos_finales)
+    def preparar_texto_receta_v2(self, actividad_manual):
+        c = []
+        if self.check_fumar.get(): 
+            c.append("- CESACIÓN TABÁQUICA: Es vital dejar de fumar.")
+        if self.check_diabetico.get(): 
+            c.append("- CONTROL GLUCÉMICO: Mantener niveles de azúcar bajo supervisión.")
+        if not self.check_Dieta.get(): 
+            c.append("- DIETA: Iniciar dieta baja en sal y grasas.")
+        
+        # Agregamos la actividad física que el usuario escribió en la ventana pequeña
+        if actividad_manual:
+            c.append(f"- ACTIVIDAD FÍSICA: {actividad_manual}")
+
+        return "\n\n".join(c) if c else "Mantener hábitos saludables." 
 if __name__ == "__main__":
     app = AppCardio()  # Crea la aplicación
     app.mainloop()     # Mantiene la ventana abierta
