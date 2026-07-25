@@ -12,7 +12,6 @@ El objetivo es brindar una herramienta precisa para el cuidado preventivo de la 
 
 # Tecnologías usadas
 * Lenguaje: Python 
-* Librerías: (Aquí pon las que usaste, ej. Math, Tkinter, etc.)
 
-# 👤 Autora
+# Autora
 Desarrollado por Lucía Portal Uipan - Estudiante de Ingeniería de Sistemas.
